@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html ng-app="rongkluea">
+    <head>
+        <title>Mark Location</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.css" />
+        <link rel="stylesheet" href="maps.css" />
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular.js"></script>
+        <!--<script src="http://maps.googleapis.com/maps/api/js?sensor=false&language=en"></script>-->
+        <script src="http://maps.googleapis.com/maps/api/js?v=3&key=AIzaSyBjoz_EmVr9sLEfxWXugeF8HqFRoqj0xjg"  type="text/javascript"></script>
+    </head>
+    <body>
+        <div class="container" ng-controller="googleMapController">
+            <div class="col-md-5">
+                <table class="table table-border">
+                    <thead>
+                        <tr>
+                            <th>name</th>
+                            <th>lat</th>
+                            <th>lng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="marker in markers| orderBy : 'name' ">
+                            <td>{{marker.title}}</td>
+                            <td>{{marker.latitude}}</td>
+                            <td>{{marker.longtitude}}</td>   
+                            <td><button type="button" ng-click="openInfoWindow($event, marker)">Click</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-7">
+                <div id="map"></div>
+            </div>
+        </div>
+        <script type="text/javascript">
+
+            var cities = [
+                {
+                    city: 'India',
+                    desc: 'This is the best country in the world!',
+                    lat: 23.200000,
+                    long: 79.225487
+                },
+                {
+                    city: 'New Delhi',
+                    desc: 'The Heart of India!',
+                    lat: 28.500000,
+                    long: 77.250000
+                },
+                {
+                    city: 'Mumbai',
+                    desc: 'Bollywood city!',
+                    lat: 19.000000,
+                    long: 72.90000
+                },
+                {
+                    city: 'Kolkata',
+                    desc: 'Howrah Bridge!',
+                    lat: 22.500000,
+                    long: 88.400000
+                },
+                {
+                    city: 'Chennai  ',
+                    desc: 'Kathipara Bridge!',
+                    lat: 13.000000,
+                    long: 80.250000
+                }
+            ];
+
+            var app = angular.module('rongkluea', []);
+            app.controller('googleMapController', function ($scope) {
+
+                var mapOptions = {
+                    zoom: 4,
+                    center: new google.maps.LatLng(25, 80),
+                    mapTypeId: google.maps.MapTypeId.TERRAIN
+                }
+
+                $scope.map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+                $scope.markers = [];
+
+                var infoWindow = new google.maps.InfoWindow();
+
+                var createMarker = function (info) {
+
+                    var marker = new google.maps.Marker({
+                        map: $scope.map,
+                        position: new google.maps.LatLng(info.lat, info.long),
+                        title: info.city
+                    });
+                    marker.latitude = info.lat;
+                    marker.longtitude = info.long;
+                    marker.content = '<div class="infoWindowContent">' + info.desc + '</div>';
+
+                    google.maps.event.addListener(marker, 'click', function () {
+                        infoWindow.setContent('<h2>' + marker.title + '</h2>' + marker.content);
+                        infoWindow.open($scope.map, marker);
+                    });
+
+                    $scope.markers.push(marker);
+
+                }
+
+                for (i = 0; i < cities.length; i++) {
+                    createMarker(cities[i]);
+                }
+
+                $scope.openInfoWindow = function (e, selectedMarker) {
+                    e.preventDefault();
+                    google.maps.event.trigger(selectedMarker, 'click');
+                }
+
+            });
+
+
+
+        </script>
+    </body>
+</html>
